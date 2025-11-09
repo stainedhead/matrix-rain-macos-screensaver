@@ -8,6 +8,7 @@ use std::ptr;
 /// Opaque pointer to MatrixRain engine (hides implementation details from C/Swift)
 pub struct MatrixRainHandle {
     engine: MatrixRain,
+    render_cache: Vec<RenderCharFFI>,
 }
 
 /// Create a new Matrix Rain engine
@@ -59,7 +60,10 @@ pub unsafe extern "C" fn matrix_rain_new(
     let config = ScreenSaverConfig::new(character_set, color_scheme, rain_speed, width, height);
     let engine = MatrixRain::new(config);
 
-    Box::into_raw(Box::new(MatrixRainHandle { engine }))
+    Box::into_raw(Box::new(MatrixRainHandle {
+        engine,
+        render_cache: Vec::new(),
+    }))
 }
 
 /// Update the Matrix Rain animation state
@@ -104,10 +108,30 @@ pub unsafe extern "C" fn matrix_rain_get_render_chars(
         return ptr::null();
     }
 
-    // This is a simplified version - in production, you'd cache the render chars
-    // to avoid allocation on every call
-    *out_count = 0;
-    ptr::null()
+    let handle = &mut *handle;
+
+    // Get render data from engine
+    let render_data = handle.engine.get_render_data();
+
+    // Clear and rebuild cache
+    handle.render_cache.clear();
+    handle.render_cache.reserve(render_data.len());
+
+    for render_char in render_data {
+        handle.render_cache.push(RenderCharFFI {
+            character: render_char.character as u32,
+            x: render_char.x,
+            y: render_char.y,
+            r: render_char.color.r,
+            g: render_char.color.g,
+            b: render_char.color.b,
+            a: render_char.color.a,
+            font_size: render_char.font_size,
+        });
+    }
+
+    *out_count = handle.render_cache.len();
+    handle.render_cache.as_ptr()
 }
 
 /// Update the configuration
@@ -235,5 +259,57 @@ mod tests {
     fn test_update_interval() {
         assert_eq!(matrix_rain_get_update_interval_ms(2), 50); // Medium
         assert_eq!(matrix_rain_get_update_interval_ms(4), 15); // Very fast
+    }
+
+    #[test]
+    fn test_render_data_export() {
+        unsafe {
+            let handle = matrix_rain_new(1920, 1080, 0, 0, 2);
+            assert!(!handle.is_null());
+
+            // Update several times to build up trails
+            for _ in 0..50 {
+                matrix_rain_update(handle);
+            }
+
+            // Get render data
+            let mut count: usize = 0;
+            let data_ptr = matrix_rain_get_render_chars(handle, &mut count as *mut usize);
+
+            // Should have some characters to render
+            assert!(count > 0, "Expected some render characters after updates");
+            assert!(!data_ptr.is_null(), "Render data pointer should not be null");
+
+            // Verify we can access the data
+            let render_slice = std::slice::from_raw_parts(data_ptr, count);
+
+            // Check that characters have valid properties
+            for render_char in render_slice {
+                assert!(render_char.x >= 0.0);
+                assert!(render_char.y >= 0.0);
+                assert!(render_char.font_size > 0.0);
+                assert!(render_char.a >= 0.0 && render_char.a <= 1.0);
+            }
+
+            matrix_rain_destroy(handle);
+        }
+    }
+
+    #[test]
+    fn test_render_data_null_safety() {
+        unsafe {
+            let mut count: usize = 0;
+
+            // Test null handle
+            let result = matrix_rain_get_render_chars(ptr::null_mut(), &mut count as *mut usize);
+            assert!(result.is_null());
+
+            // Test null count pointer
+            let handle = matrix_rain_new(1920, 1080, 0, 0, 2);
+            let result = matrix_rain_get_render_chars(handle, ptr::null_mut());
+            assert!(result.is_null());
+
+            matrix_rain_destroy(handle);
+        }
     }
 }

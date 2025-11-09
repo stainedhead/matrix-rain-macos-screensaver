@@ -66,18 +66,36 @@ impl ColorScheme {
 
     /// Get color with alpha transparency (0.0 = transparent, 1.0 = opaque)
     /// Returns (r, g, b, a) with RGB in 0-255 range and alpha in 0.0-1.0 range
+    ///
+    /// Classic Matrix effect:
+    /// - Leading character (position 0.0): Bright white
+    /// - Next few characters (0.0-0.15): Bright primary color
+    /// - Mid trail (0.15-0.5): Medium brightness
+    /// - Tail (0.5-1.0): Fading to black
     pub fn get_color_with_alpha(&self, position_in_trail: f32) -> (u8, u8, u8, f32) {
-        let (r, g, b) = if position_in_trail < 0.2 {
+        let (r, g, b) = if position_in_trail < 0.05 {
+            // Leading character is bright white for that classic Matrix look
+            (255, 255, 255)
+        } else if position_in_trail < 0.15 {
+            // Very bright primary color right behind the leader
             self.get_primary_color()
-        } else if position_in_trail < 0.6 {
+        } else if position_in_trail < 0.5 {
+            // Medium brightness in mid-trail
             self.get_secondary_color()
         } else {
+            // Fading tail
             self.get_tertiary_color()
         };
 
-        // Alpha decreases as we go down the trail
-        let alpha = 1.0 - position_in_trail;
-        (r, g, b, alpha.max(0.0).min(1.0))
+        // Alpha decreases more gradually for a longer visible trail
+        let alpha = if position_in_trail < 0.1 {
+            1.0 // Leading characters fully opaque
+        } else {
+            // Smooth fade from 1.0 to 0.0
+            (1.0 - (position_in_trail - 0.1) / 0.9).max(0.0).min(1.0)
+        };
+
+        (r, g, b, alpha)
     }
 
     /// Get all available color schemes

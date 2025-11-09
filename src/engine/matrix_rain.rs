@@ -176,6 +176,47 @@ impl MatrixRain {
     pub fn total_columns(&self) -> usize {
         self.columns.len()
     }
+
+    /// Get render data without actually rendering (useful for FFI)
+    pub fn get_render_data(&self) -> Vec<RenderChar> {
+        let mut render_chars = Vec::new();
+
+        for column in &self.columns {
+            if !column.active {
+                continue;
+            }
+
+            let x_pixel = column.x as f32 * self.char_width;
+
+            for (ch, y_pos, trail_pos) in column.get_trail_positions() {
+                // Skip characters above screen
+                if y_pos < 0.0 {
+                    continue;
+                }
+
+                let y_pixel = y_pos * self.char_height;
+
+                // Skip characters below screen
+                if y_pixel > self.config.screen_height as f32 {
+                    continue;
+                }
+
+                // Get color based on position in trail
+                let rgba = self.config.color_scheme.get_color_with_alpha(trail_pos);
+                let color = Color::from_rgba_tuple(rgba);
+
+                render_chars.push(RenderChar {
+                    character: ch,
+                    x: x_pixel,
+                    y: y_pixel,
+                    color,
+                    font_size: self.font_size,
+                });
+            }
+        }
+
+        render_chars
+    }
 }
 
 #[cfg(test)]

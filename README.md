@@ -158,23 +158,29 @@ matrix.render(&mut your_renderer);
 
 ### As a macOS Screensaver
 
-#### Current Status
-The macOS screensaver bundle (`.saver` file) is currently in development. However, you can use the CLI application with macOS Terminal as a workaround, or integrate the library into your own screensaver project.
+#### Building the Screensaver
 
-#### Future macOS Screensaver Deployment
+The macOS screensaver implementation is complete and ready to build:
 
-When the screensaver bundle is available, installation will be:
-
-**Option 1: User Installation**
 ```bash
-# Download the .saver bundle
-curl -L https://github.com/iggybdda/matrix-rain-macos-screensaver/releases/latest/download/MatrixRain.saver.zip -o MatrixRain.saver.zip
+# Build the Rust FFI library
+cargo build --release --features ffi
 
-# Unzip
-unzip MatrixRain.saver.zip
+# Build the screensaver bundle
+cd macos-screensaver
+./build-screensaver.sh
+```
 
-# Install for current user
-cp -r MatrixRain.saver ~/Library/Screen\ Savers/
+This creates `macos-screensaver/build/MatrixRainSaver.saver`.
+
+#### Installation
+
+Once built, install the screensaver:
+
+**User Installation**
+```bash
+# Copy the built screensaver to your Screen Savers folder
+cp -r macos-screensaver/build/MatrixRainSaver.saver ~/Library/Screen\ Savers/
 
 # Or double-click the .saver file to install via Finder
 open MatrixRain.saver
