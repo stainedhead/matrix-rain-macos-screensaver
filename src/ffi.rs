@@ -30,7 +30,10 @@ pub unsafe extern "C" fn matrix_rain_new(
         3 => CharacterSet::Sinhala,
         4 => CharacterSet::Korean,
         5 => CharacterSet::Jawi,
-        6 => CharacterSet::Mixed,
+        6 => CharacterSet::Arabic,
+        7 => CharacterSet::Hebrew,
+        8 => CharacterSet::Thai,
+        9 => CharacterSet::Mixed,
         _ => CharacterSet::Japanese,
     };
 
@@ -161,7 +164,10 @@ pub unsafe extern "C" fn matrix_rain_set_config(
         3 => CharacterSet::Sinhala,
         4 => CharacterSet::Korean,
         5 => CharacterSet::Jawi,
-        6 => CharacterSet::Mixed,
+        6 => CharacterSet::Arabic,
+        7 => CharacterSet::Hebrew,
+        8 => CharacterSet::Thai,
+        9 => CharacterSet::Mixed,
         _ => CharacterSet::Japanese,
     };
 

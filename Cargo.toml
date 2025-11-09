@@ -1,6 +1,6 @@
 [package]
 name = "matrix_rain_core"
-version = "0.1.0"
+version = "1.1.17"
 edition = "2021"
 authors = ["Matrix Rain Contributors"]
 description = "A Matrix-style digital rain screensaver for macOS with customizable character sets and colors"
