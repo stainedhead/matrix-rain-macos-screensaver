@@ -39,27 +39,98 @@ Five speed levels to match your preference:
 - Fast
 - Very Fast
 
+## Screenshots
+
+![Matrix Rain CLI Demo](docs/images/demo-screenshot.png)
+
+*Matrix Rain running in terminal with Korean characters and purple color scheme*
+
 ## Installation
 
-### Prerequisites
-- macOS 10.15 (Catalina) or later
-- Rust 1.70 or later (for building from source)
+### Quick Start (CLI)
+
+Download the pre-built binary for your system from the [releases page](https://github.com/iggybdda/matrix-rain-macos-screensaver/releases):
+
+```bash
+# macOS (Apple Silicon)
+curl -L https://github.com/iggybdda/matrix-rain-macos-screensaver/releases/latest/download/matrix-rain-macos-aarch64 -o matrix-rain
+chmod +x matrix-rain
+./matrix-rain
+
+# macOS (Intel)
+curl -L https://github.com/iggybdda/matrix-rain-macos-screensaver/releases/latest/download/matrix-rain-macos-x86_64 -o matrix-rain
+chmod +x matrix-rain
+./matrix-rain
+
+# Linux
+curl -L https://github.com/iggybdda/matrix-rain-macos-screensaver/releases/latest/download/matrix-rain-linux-x86_64 -o matrix-rain
+chmod +x matrix-rain
+./matrix-rain
+```
 
 ### Building from Source
+
+#### Prerequisites
+- macOS 10.15+ or Linux
+- Rust 1.70 or later
+
+#### Build Steps
 
 ```bash
 # Clone the repository
 git clone https://github.com/iggybdda/matrix-rain-macos-screensaver.git
 cd matrix-rain-macos-screensaver
 
-# Build the project
+# Build the library
 cargo build --release
+
+# Build the CLI application
+cargo build --release --features cli --bin matrix-rain
 
 # Run tests
 cargo test
+cargo test --features cli
+
+# Install CLI globally (optional)
+cargo install --path . --features cli --bin matrix-rain
 ```
 
 ## Usage
+
+### CLI Application
+
+Run the Matrix rain effect in your terminal:
+
+```bash
+# Basic usage with defaults (Japanese characters, Matrix green, medium speed)
+matrix-rain
+
+# Custom configuration
+matrix-rain --charset korean --color purple --speed fast
+
+# Short aliases
+matrix-rain -c hindi -o cyan -s slow
+
+# Run for specific duration (30 seconds)
+matrix-rain --duration 30
+
+# List all available options
+matrix-rain --list
+```
+
+**Available Options:**
+
+| Option | Short | Values | Description |
+|--------|-------|--------|-------------|
+| `--charset` | `-c` | japanese, hindi, tamil, sinhala, korean, jawi | Character set to use |
+| `--color` | `-o` | matrix-green, blue, purple, orange, red, cyan, yellow, pink, white, lime, teal | Color scheme |
+| `--speed` | `-s` | very-slow, slow, medium, fast, very-fast | Animation speed |
+| `--duration` | `-d` | seconds | Run for specified duration (omit for indefinite) |
+| `--list` | `-l` | - | Show all available options |
+
+**Controls:**
+- Press `q`, `Q`, or `Esc` to exit
+- Press `Ctrl+C` to exit
 
 ### As a Library
 
@@ -87,7 +158,98 @@ matrix.render(&mut your_renderer);
 
 ### As a macOS Screensaver
 
-*Note: macOS screensaver integration is currently in development. The core library is fully functional and tested.*
+#### Current Status
+The macOS screensaver bundle (`.saver` file) is currently in development. However, you can use the CLI application with macOS Terminal as a workaround, or integrate the library into your own screensaver project.
+
+#### Future macOS Screensaver Deployment
+
+When the screensaver bundle is available, installation will be:
+
+**Option 1: User Installation**
+```bash
+# Download the .saver bundle
+curl -L https://github.com/iggybdda/matrix-rain-macos-screensaver/releases/latest/download/MatrixRain.saver.zip -o MatrixRain.saver.zip
+
+# Unzip
+unzip MatrixRain.saver.zip
+
+# Install for current user
+cp -r MatrixRain.saver ~/Library/Screen\ Savers/
+
+# Or double-click the .saver file to install via Finder
+open MatrixRain.saver
+```
+
+**Option 2: System-Wide Installation** (requires admin)
+```bash
+# Install for all users
+sudo cp -r MatrixRain.saver /Library/Screen\ Savers/
+```
+
+**Configuring in System Preferences:**
+1. Open System Preferences (or System Settings on macOS 13+)
+2. Navigate to:
+   - **macOS 13+**: Desktop & Screen Saver → Screen Saver
+   - **macOS 12 and earlier**: Desktop & Screen Saver
+3. Select "Matrix Rain" from the screensaver list
+4. Click "Screen Saver Options" to customize:
+   - Character set (Japanese, Hindi, Tamil, Sinhala, Korean, Jawi)
+   - Color scheme (11 options)
+   - Animation speed (5 levels)
+
+**Testing Your Screensaver:**
+```bash
+# Preview in System Preferences
+open /System/Library/PreferencePanes/DesktopScreenEffectsPref.prefPane
+
+# Test directly (macOS 12 and earlier)
+/System/Library/CoreServices/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine -module MatrixRain
+
+# Test directly (macOS 13+)
+/System/Library/Frameworks/ScreenSaver.framework/Versions/A/Resources/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine
+```
+
+#### Custom Development
+
+To create your own macOS screensaver using this library:
+
+1. **Create a new Xcode project** → macOS → Screen Saver
+2. **Add the Rust library** as a dependency
+3. **Implement the ScreenSaverView** subclass:
+
+```swift
+import ScreenSaver
+import MatrixRainCore  // Via FFI bridge
+
+class MatrixRainView: ScreenSaverView {
+    var matrixEngine: OpaquePointer?
+
+    override init?(frame: NSRect, isPreview: Bool) {
+        super.init(frame: frame, isPreview: isPreview)
+
+        // Initialize Rust engine via FFI
+        matrixEngine = matrix_rain_new(
+            UInt32(frame.width),
+            UInt32(frame.height)
+        )
+    }
+
+    override func animateOneFrame() {
+        // Update and render via Rust engine
+        matrix_rain_update(matrixEngine)
+        matrix_rain_render(matrixEngine, /* Core Graphics context */)
+    }
+
+    deinit {
+        matrix_rain_destroy(matrixEngine)
+    }
+}
+```
+
+4. **Build the screensaver bundle**
+5. **Install** to `~/Library/Screen Savers/`
+
+See [documents/technical-details.md](documents/technical-details.md) for more information on creating custom integrations.
 
 ## Project Structure
 
