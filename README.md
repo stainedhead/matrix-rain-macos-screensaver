@@ -360,16 +360,31 @@ For detailed technical information, see [documents/technical-details.md](documen
 
 ## Roadmap
 
+### Completed ✅
 - [x] Core rain engine
-- [x] Multiple character set support
-- [x] Color customization
-- [x] Speed settings
+- [x] Multiple character set support (6 languages)
+- [x] Color customization (11 color schemes)
+- [x] Speed settings (5 levels)
+- [x] Terminal CLI application
+- [x] CI/CD with GitHub Actions
+- [x] Cross-platform binary builds
+- [x] Comprehensive test suite (46 tests)
+- [x] Full documentation
+
+### In Progress 🚧
 - [ ] macOS ScreenSaver bundle integration
-- [ ] User preferences UI
-- [ ] Installer package
-- [ ] Additional character sets
-- [ ] Custom character set support
+- [ ] User preferences UI for screensaver
+- [ ] Installer package (.pkg)
+
+### Future Enhancements 🔮
+- [ ] Additional character sets (Arabic, Hebrew, Thai, etc.)
+- [ ] Custom character set support (user-defined)
 - [ ] Multi-monitor support
+- [ ] GPU acceleration for high-resolution displays
+- [ ] Audio reactivity mode
+- [ ] Interactive mode (mouse/keyboard patterns)
+- [ ] Configuration profiles
+- [ ] Snapshot/export feature
 
 ## License
 

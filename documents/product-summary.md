@@ -56,8 +56,10 @@ Matrix Rain macOS Screensaver is a customizable, high-performance screensaver ap
 
 - **Language**: Rust (2021 edition)
 - **Architecture**: Modular design with clear separation of concerns
-- **Testing**: 42+ unit tests with 100% critical path coverage
-- **Platform**: macOS 10.15+ (with potential for cross-platform expansion)
+- **Testing**: 46 unit tests with 100% critical path coverage
+- **Platform**: Cross-platform (macOS, Linux, with Windows potential)
+- **CLI Application**: Terminal-based version using crossterm
+- **CI/CD**: Automated builds and releases via GitHub Actions
 - **Dependencies**: Minimal, well-maintained crates only
 
 ### Current Status
@@ -65,34 +67,50 @@ Matrix Rain macOS Screensaver is a customizable, high-performance screensaver ap
 **Version**: 0.1.0 (Initial Release)
 
 **Completed Components**:
-- ✅ Core rain engine
-- ✅ Character set management
-- ✅ Color scheme system
-- ✅ Speed configuration
-- ✅ Comprehensive test suite
-- ✅ Library API
+- ✅ Core rain engine with column-based animation
+- ✅ Character set management (6 languages)
+- ✅ Color scheme system (11 colors)
+- ✅ Speed configuration (5 levels)
+- ✅ Comprehensive test suite (46 tests)
+- ✅ Library API with trait-based rendering
+- ✅ Terminal CLI application
+- ✅ Cross-platform binary builds
+- ✅ GitHub Actions CI/CD
+- ✅ Complete documentation suite
 
 **In Development**:
 - 🔨 macOS ScreenSaver bundle integration
 - 🔨 User preferences interface
-- 🔨 Installation package
+- 🔨 Installation package (.pkg)
+
+**Available Now**:
+- Download pre-built CLI binaries from GitHub Releases
+- Install via `cargo install` (when published to crates.io)
+- Use as a library in your own Rust projects
+- Run in terminal with full customization
 
 ### Use Cases
 
-1. **Personal Use**: Add visual interest to idle screen time
-2. **Office/Workplace**: Professional yet engaging screensaver
-3. **Public Displays**: Eye-catching visuals for kiosks or exhibits
-4. **Development**: Use as a library component in other projects
-5. **Educational**: Example of well-structured Rust code
+1. **Terminal Eye Candy**: Run in your terminal for ambient background visuals
+2. **Personal Screensaver**: Future macOS screensaver integration for idle screen time
+3. **Office/Workplace**: Professional yet engaging visual display
+4. **Public Displays**: Eye-catching visuals for kiosks or exhibits
+5. **Development**: Use as a library component in other projects
+6. **Educational**: Example of well-structured Rust code and TDD practices
+7. **Livestreaming**: Cool background effect for coding streams
+8. **Presentations**: Visual flair during breaks or transitions
 
 ### Differentiation
 
 Unlike other Matrix screensavers:
 - **Multi-language support**: Six different character sets, not just Latin/Japanese
+- **Cross-platform CLI**: Works in any terminal, not just as a screensaver
 - **Type-safe**: Built in Rust with compile-time safety guarantees
-- **Well-tested**: Comprehensive test suite with TDD methodology
-- **Library-first**: Usable as a standalone library, not just a screensaver
-- **Modern tooling**: Cargo, proper dependency management, CI/CD ready
+- **Well-tested**: 46 unit tests with TDD methodology and 100% critical path coverage
+- **Library-first**: Usable as a standalone library, CLI app, or future screensaver
+- **Modern tooling**: Cargo, proper dependency management, automated CI/CD
+- **Pre-built binaries**: Download and run immediately without compilation
+- **Open development**: Transparent development with comprehensive documentation
 
 ### Success Metrics
 
