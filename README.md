@@ -20,13 +20,14 @@ A customizable Matrix-style digital rain screensaver for macOS, written in Rust.
 - **Screen Resize Support**: Automatic adaptation to window/terminal size changes
 
 ### 🌐 Multiple Language Support
-Choose from six different character sets:
+Choose from seven different character sets:
 - **Japanese** (Katakana) - The classic Matrix look
 - **Hindi** (Devanagari script)
 - **Tamil** script
 - **Sinhala** script
 - **Korean** (Hangul)
 - **Jawi** (Arabic-based Malaysian script)
+- **Mixed** - Eclectic blend (50% Japanese, 10% each other script)
 
 ### 🎨 Customizable Color Schemes
 Select from 11 beautiful color options:
@@ -133,7 +134,7 @@ matrix-rain --list
 
 | Option | Short | Values | Description |
 |--------|-------|--------|-------------|
-| `--charset` | `-c` | japanese, hindi, tamil, sinhala, korean, jawi | Character set to use |
+| `--charset` | `-c` | japanese, hindi, tamil, sinhala, korean, jawi, mixed | Character set to use |
 | `--color` | `-o` | matrix-green, blue, purple, orange, red, cyan, yellow, pink, white, lime, teal | Color scheme |
 | `--speed` | `-s` | very-slow, slow, medium, fast, very-fast | Animation speed |
 | `--duration` | `-d` | seconds | Run for specified duration (omit for indefinite) |
@@ -383,7 +384,7 @@ For detailed technical information, see [documents/technical-details.md](documen
 - [x] **Smooth color fade progression** (white → bright → medium → dark)
 - [x] **Dual-layer background rain** for depth effect (30% opacity, slower speed)
 - [x] **Full screen resize support** (CLI, engine, FFI, screensaver)
-- [x] Multiple character set support (6 languages)
+- [x] Multiple character set support (7 sets: 6 languages + mixed)
 - [x] Color customization (11 color schemes)
 - [x] Speed settings (5 levels)
 - [x] Terminal CLI application with resize support
@@ -393,7 +394,7 @@ For detailed technical information, see [documents/technical-details.md](documen
 - [x] **Automated build system** for screensaver
 - [x] CI/CD with GitHub Actions
 - [x] Cross-platform binary builds
-- [x] Comprehensive test suite (49 tests)
+- [x] Comprehensive test suite (51 tests)
 - [x] Full documentation
 
 ### Ready for Testing 🧪

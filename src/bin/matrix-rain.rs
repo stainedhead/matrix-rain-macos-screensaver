@@ -42,6 +42,7 @@ fn parse_charset(s: &str) -> Result<CharacterSet> {
         "sinhala" | "si" => Ok(CharacterSet::Sinhala),
         "korean" | "ko" => Ok(CharacterSet::Korean),
         "jawi" | "jw" => Ok(CharacterSet::Jawi),
+        "mixed" | "mix" => Ok(CharacterSet::Mixed),
         _ => Err(anyhow::anyhow!("Unknown character set: {}", s)),
     }
 }
@@ -84,6 +85,7 @@ fn print_available_options() {
     println!("  sinhala (si)   - Sinhala script");
     println!("  korean (ko)    - Korean Hangul");
     println!("  jawi (jw)      - Malaysian Jawi (Arabic-based)");
+    println!("  mixed (mix)    - Mixed scripts (50% Japanese, 10% each other)");
 
     println!("\nColor Schemes:");
     println!("  matrix-green   - Classic Matrix green (default)");
@@ -210,6 +212,8 @@ mod tests {
         ));
         assert!(matches!(parse_charset("jp"), Ok(CharacterSet::Japanese)));
         assert!(matches!(parse_charset("hindi"), Ok(CharacterSet::Hindi)));
+        assert!(matches!(parse_charset("mixed"), Ok(CharacterSet::Mixed)));
+        assert!(matches!(parse_charset("mix"), Ok(CharacterSet::Mixed)));
         assert!(parse_charset("invalid").is_err());
     }
 

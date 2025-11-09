@@ -17,6 +17,8 @@ pub enum CharacterSet {
     Korean,
     /// Malaysian Jawi script (Arabic-based)
     Jawi,
+    /// Mixed character set (50% Japanese, 50% from other sets)
+    Mixed,
 }
 
 impl CharacterSet {
@@ -88,6 +90,45 @@ impl CharacterSet {
                 chars.extend((0x08A0..=0x08FF).filter_map(std::char::from_u32));
                 chars
             }
+            CharacterSet::Mixed => {
+                // Mixed set: 50% Japanese, 10% each from other 5 sets
+                let mut mixed_chars = Vec::new();
+
+                // Get all character sets
+                let japanese_chars = CharacterSet::Japanese.get_characters();
+                let hindi_chars = CharacterSet::Hindi.get_characters();
+                let tamil_chars = CharacterSet::Tamil.get_characters();
+                let sinhala_chars = CharacterSet::Sinhala.get_characters();
+                let korean_chars = CharacterSet::Korean.get_characters();
+                let jawi_chars = CharacterSet::Jawi.get_characters();
+
+                // Calculate target counts (aim for ~500 total characters)
+                let total_target = 500;
+                let japanese_count = (total_target as f32 * 0.5) as usize; // 50%
+                let other_count = (total_target as f32 * 0.1) as usize;    // 10% each
+
+                // Take Japanese characters (50%)
+                let japanese_sample: Vec<char> = japanese_chars
+                    .iter()
+                    .step_by((japanese_chars.len() / japanese_count).max(1))
+                    .copied()
+                    .take(japanese_count)
+                    .collect();
+                mixed_chars.extend(japanese_sample);
+
+                // Take from each other set (10% each)
+                for chars in [&hindi_chars, &tamil_chars, &sinhala_chars, &korean_chars, &jawi_chars] {
+                    let sample: Vec<char> = chars
+                        .iter()
+                        .step_by((chars.len() / other_count).max(1))
+                        .copied()
+                        .take(other_count)
+                        .collect();
+                    mixed_chars.extend(sample);
+                }
+
+                mixed_chars
+            }
         }
     }
 
@@ -125,6 +166,7 @@ mod tests {
             CharacterSet::Sinhala,
             CharacterSet::Korean,
             CharacterSet::Jawi,
+            CharacterSet::Mixed,
         ];
 
         for set in sets {
@@ -147,5 +189,64 @@ mod tests {
     #[test]
     fn test_default_character_set() {
         assert_eq!(CharacterSet::default(), CharacterSet::Japanese);
+    }
+
+    #[test]
+    fn test_mixed_character_set() {
+        let chars = CharacterSet::Mixed.get_characters();
+
+        // Should have around 500 characters
+        assert!(chars.len() >= 400 && chars.len() <= 600,
+                "Mixed set should have ~500 characters, got {}", chars.len());
+
+        // Should not be empty
+        assert!(!chars.is_empty());
+
+        // Get individual sets for comparison
+        let japanese_chars = CharacterSet::Japanese.get_characters();
+        let hindi_chars = CharacterSet::Hindi.get_characters();
+        let tamil_chars = CharacterSet::Tamil.get_characters();
+        let sinhala_chars = CharacterSet::Sinhala.get_characters();
+        let korean_chars = CharacterSet::Korean.get_characters();
+        let jawi_chars = CharacterSet::Jawi.get_characters();
+
+        // Count how many characters from each set appear in mixed
+        let japanese_count = chars.iter().filter(|c| japanese_chars.contains(c)).count();
+        let hindi_count = chars.iter().filter(|c| hindi_chars.contains(c)).count();
+        let tamil_count = chars.iter().filter(|c| tamil_chars.contains(c)).count();
+        let sinhala_count = chars.iter().filter(|c| sinhala_chars.contains(c)).count();
+        let korean_count = chars.iter().filter(|c| korean_chars.contains(c)).count();
+        let jawi_count = chars.iter().filter(|c| jawi_chars.contains(c)).count();
+
+        // Japanese should be roughly 50% (within tolerance)
+        let total = chars.len() as f32;
+        let japanese_ratio = japanese_count as f32 / total;
+        assert!(japanese_ratio >= 0.45 && japanese_ratio <= 0.55,
+                "Japanese should be ~50%, got {:.1}%", japanese_ratio * 100.0);
+
+        // Each other set should be roughly 10% (within tolerance)
+        for (name, count) in [
+            ("Hindi", hindi_count),
+            ("Tamil", tamil_count),
+            ("Sinhala", sinhala_count),
+            ("Korean", korean_count),
+            ("Jawi", jawi_count),
+        ] {
+            let ratio = count as f32 / total;
+            assert!(ratio >= 0.05 && ratio <= 0.15,
+                    "{} should be ~10%, got {:.1}%", name, ratio * 100.0);
+        }
+    }
+
+    #[test]
+    fn test_mixed_random_character() {
+        let mut rng = thread_rng();
+        let char_set = CharacterSet::Mixed;
+
+        // Generate 100 random characters and ensure they're all valid
+        for _ in 0..100 {
+            let ch = char_set.random_character(&mut rng);
+            assert!(char_set.get_characters().contains(&ch));
+        }
     }
 }

@@ -50,7 +50,8 @@ class Preferences: ObservableObject {
         "Tamil",
         "Sinhala",
         "Korean",
-        "Jawi"
+        "Jawi",
+        "Mixed"
     ]
 
     // Color scheme names for UI
