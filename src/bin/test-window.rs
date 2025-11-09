@@ -94,7 +94,7 @@ fn create_matrix_view_class() -> *const Class {
             let font_size: CGFloat = 16.0;
             let font: id = msg_send![class!(NSFont), monospacedSystemFontOfSize:font_size weight:0.0];
 
-            // Draw each character
+            // Draw each character with simple color set
             for render_char in chars.iter() {
                 // Convert character to NSString
                 let char_string = render_char.character.to_string();
@@ -109,23 +109,24 @@ fn create_matrix_view_class() -> *const Class {
                     alpha: render_char.color.a as CGFloat / 255.0
                 ];
 
-                // Create attributes dictionary with proper NSAttributedString keys
-                let dict: id = msg_send![class!(NSMutableDictionary), dictionary];
+                // Set the color as current
+                let _: () = msg_send![color, set];
 
-                // NSFontAttributeName
-                let font_key = NSString::alloc(nil).init_str("NSFont");
-                let _: () = msg_send![dict, setObject:font forKey:font_key];
-
-                // NSForegroundColorAttributeName
-                let color_key = NSString::alloc(nil).init_str("NSColor");
-                let _: () = msg_send![dict, setObject:color forKey:color_key];
-
-                // Draw the string
+                // Draw the string at position with font
                 let point = NSPoint::new(render_char.x as f64, render_char.y as f64);
-                let _: () = msg_send![ns_string, drawAtPoint:point withAttributes:dict];
+
+                // Create attributed string with font
+                let attr_string: id = msg_send![class!(NSAttributedString), alloc];
+                let font_attr_name = NSString::alloc(nil).init_str("NSFont");
+                let attrs: id = msg_send![class!(NSDictionary), dictionaryWithObject:font forKey:font_attr_name];
+                let attr_string: id = msg_send![attr_string, initWithString:ns_string attributes:attrs];
+
+                let _: () = msg_send![attr_string, drawAtPoint:point];
 
                 // Release
                 let _: () = msg_send![ns_string, release];
+                let _: () = msg_send![attr_string, release];
+                let _: () = msg_send![font_attr_name, release];
             }
         }
     }
