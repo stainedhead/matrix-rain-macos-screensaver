@@ -123,6 +123,11 @@ jobs:
           chmod +x scripts/build-installer.sh
           ./scripts/build-installer.sh
 
+      - name: Build DMG
+        run: |
+          chmod +x scripts/build-dmg.sh
+          ./scripts/build-dmg.sh
+
       - name: Get version
         id: get_version
         run: |
@@ -145,6 +150,12 @@ jobs:
         with:
           name: MatrixRainSaver-${{ steps.get_version.outputs.VERSION }}.pkg
           path: release/MatrixRainSaver-${{ steps.get_version.outputs.VERSION }}.pkg
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: MatrixRainSaver-${{ steps.get_version.outputs.VERSION }}.dmg
+          path: release/MatrixRainSaver-${{ steps.get_version.outputs.VERSION }}.dmg
 
       - name: Upload CLI binary
         uses: actions/upload-artifact@v4
@@ -208,6 +219,7 @@ jobs:
           # Find and copy all artifacts
           find artifacts -type f -name "matrix-rain-*" -exec cp {} release-assets/ \;
           find artifacts -type f -name "MatrixRainSaver-*.pkg" -exec cp {} release-assets/ \;
+          find artifacts -type f -name "MatrixRainSaver-*.dmg" -exec cp {} release-assets/ \;
           find artifacts -type f -name "MatrixRainSaver-*.saver.zip" -exec cp {} release-assets/ \;
 
       - name: Create Release
@@ -222,7 +234,8 @@ jobs:
             ## Matrix Rain v${{ steps.get_version.outputs.VERSION }}
 
             ### macOS Screensaver
-            - **Download the .pkg installer** for easy installation (recommended)
+            - **Download the .dmg disk image** for the easiest installation experience (drag & drop)
+            - **Download the .pkg installer** for automated installation
             - Or download the .saver.zip bundle and manually copy to ~/Library/Screen Savers/
 
             ### CLI Application
