@@ -11,10 +11,6 @@ repository = "https://github.com/iggybdda/matrix-rain-macos-screensaver"
 rand = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-# CLI dependencies (optional, only used by binary)
-crossterm = { version = "0.27", optional = true }
-clap = { version = "4.5", features = ["derive"], optional = true }
-anyhow = { version = "1.0", optional = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
@@ -25,14 +21,14 @@ core-graphics = "0.23"
 
 [features]
 default = []
-cli = ["crossterm", "clap", "anyhow"]
 ffi = []
+windowed = []
 
 [lib]
 name = "matrix_rain_core"
 crate-type = ["lib", "cdylib"]
 
 [[bin]]
-name = "matrix-rain"
-path = "src/bin/matrix-rain.rs"
-required-features = ["cli"]
+name = "matrix-rain-test"
+path = "src/bin/test-window.rs"
+required-features = ["windowed"]
