@@ -109,14 +109,15 @@ fn create_matrix_view_class() -> *const Class {
                     alpha: render_char.color.a as CGFloat / 255.0
                 ];
 
-                // Create attributes dictionary
-                let font_key: id = msg_send![class!(NSString), alloc];
-                let font_key: id = msg_send![font_key, initWithUTF8String: "NSFont\0".as_ptr()];
-                let color_key: id = msg_send![class!(NSString), alloc];
-                let color_key: id = msg_send![color_key, initWithUTF8String: "NSColor\0".as_ptr()];
-
+                // Create attributes dictionary with proper NSAttributedString keys
                 let dict: id = msg_send![class!(NSMutableDictionary), dictionary];
+
+                // NSFontAttributeName
+                let font_key = NSString::alloc(nil).init_str("NSFont");
                 let _: () = msg_send![dict, setObject:font forKey:font_key];
+
+                // NSForegroundColorAttributeName
+                let color_key = NSString::alloc(nil).init_str("NSColor");
                 let _: () = msg_send![dict, setObject:color forKey:color_key];
 
                 // Draw the string
@@ -125,8 +126,6 @@ fn create_matrix_view_class() -> *const Class {
 
                 // Release
                 let _: () = msg_send![ns_string, release];
-                let _: () = msg_send![font_key, release];
-                let _: () = msg_send![color_key, release];
             }
         }
     }
@@ -215,13 +214,13 @@ fn main() {
 
         window.setContentView_(view);
 
-        // Start animation timer
+        // Start animation timer - call display directly on the view
         let timer_interval: f64 = 1.0 / 60.0; // 60 FPS
         let timer: id = msg_send![
             class!(NSTimer),
             scheduledTimerWithTimeInterval: timer_interval
             target: view
-            selector: selector("setNeedsDisplay:")
+            selector: selector("display")
             userInfo: nil
             repeats: YES
         ];
