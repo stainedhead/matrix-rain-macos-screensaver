@@ -367,26 +367,37 @@ For detailed technical information, see [documents/technical-details.md](documen
 ## Roadmap
 
 ### Completed ✅
-- [x] Core rain engine
+- [x] Core rain engine with authentic Matrix visuals
+- [x] **Bright white leading character effect** (classic Matrix look)
+- [x] **Smooth color fade progression** (white → bright → medium → dark)
 - [x] Multiple character set support (6 languages)
 - [x] Color customization (11 color schemes)
 - [x] Speed settings (5 levels)
-- [x] Terminal CLI application
+- [x] Terminal CLI application with resize support
+- [x] **FFI render data export** for external renderers
+- [x] **macOS ScreenSaver bundle** (Swift + Rust)
+- [x] **User preferences UI** (SwiftUI configuration panel)
+- [x] **Automated build system** for screensaver
 - [x] CI/CD with GitHub Actions
 - [x] Cross-platform binary builds
-- [x] Comprehensive test suite (46 tests)
+- [x] Comprehensive test suite (49 tests)
 - [x] Full documentation
 
-### In Progress 🚧
-- [ ] macOS ScreenSaver bundle integration
-- [ ] User preferences UI for screensaver
-- [ ] Installer package (.pkg)
+### Ready for Testing 🧪
+- [ ] Test screensaver on physical macOS device
+- [ ] Capture screenshot/video for README
+- [ ] Verify configuration panel functionality
+- [ ] Test multi-monitor behavior
 
 ### Future Enhancements 🔮
+- [ ] Installer package (.pkg) with code signing
+- [ ] Universal binary (Intel + Apple Silicon)
 - [ ] Additional character sets (Arabic, Hebrew, Thai, etc.)
 - [ ] Custom character set support (user-defined)
-- [ ] Multi-monitor support
-- [ ] GPU acceleration for high-resolution displays
+- [ ] Per-monitor configuration
+- [ ] Metal GPU acceleration for 4K+ displays
+- [ ] Audio reactivity using AVFoundation
+- [ ] Screen recording export to video/GIF
 - [ ] Audio reactivity mode
 - [ ] Interactive mode (mouse/keyboard patterns)
 - [ ] Configuration profiles
