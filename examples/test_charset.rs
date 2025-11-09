@@ -28,7 +28,7 @@ fn main() {
         println!("\n");
 
         // Check for replacement characters (�) which indicate missing glyphs
-        let has_replacement = chars.iter().any(|&ch| ch == '\u{FFFD}');
+        let has_replacement = chars.contains(&'\u{FFFD}');
         if has_replacement {
             println!("  ⚠️  WARNING: Contains replacement characters (missing glyphs)");
         }

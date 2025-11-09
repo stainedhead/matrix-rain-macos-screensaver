@@ -3,9 +3,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Available color schemes
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ColorScheme {
     /// Classic Matrix green
+    #[default]
     MatrixGreen,
     /// Dark blue
     DarkBlue,
@@ -53,7 +54,11 @@ impl ColorScheme {
     pub fn get_secondary_color(&self) -> (u8, u8, u8) {
         let (r, g, b) = self.get_primary_color();
         // Darken by about 40%
-        ((r as f32 * 0.6) as u8, (g as f32 * 0.6) as u8, (b as f32 * 0.6) as u8)
+        (
+            (r as f32 * 0.6) as u8,
+            (g as f32 * 0.6) as u8,
+            (b as f32 * 0.6) as u8,
+        )
     }
 
     /// Get the tertiary color RGB values (0-255)
@@ -61,7 +66,11 @@ impl ColorScheme {
     pub fn get_tertiary_color(&self) -> (u8, u8, u8) {
         let (r, g, b) = self.get_primary_color();
         // Darken by about 70%
-        ((r as f32 * 0.3) as u8, (g as f32 * 0.3) as u8, (b as f32 * 0.3) as u8)
+        (
+            (r as f32 * 0.3) as u8,
+            (g as f32 * 0.3) as u8,
+            (b as f32 * 0.3) as u8,
+        )
     }
 
     /// Get color with alpha transparency (0.0 = transparent, 1.0 = opaque)
@@ -92,7 +101,7 @@ impl ColorScheme {
             1.0 // Leading characters fully opaque
         } else {
             // Smooth fade from 1.0 to 0.0
-            (1.0 - (position_in_trail - 0.1) / 0.9).max(0.0).min(1.0)
+            (1.0 - (position_in_trail - 0.1) / 0.9).clamp(0.0, 1.0)
         };
 
         (r, g, b, alpha)
@@ -113,12 +122,6 @@ impl ColorScheme {
             ColorScheme::LimeGreen,
             ColorScheme::Teal,
         ]
-    }
-}
-
-impl Default for ColorScheme {
-    fn default() -> Self {
-        ColorScheme::MatrixGreen
     }
 }
 

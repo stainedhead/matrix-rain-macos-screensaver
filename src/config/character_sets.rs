@@ -3,9 +3,10 @@
 use serde::{Deserialize, Serialize};
 
 /// Available character sets for the Matrix rain effect
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum CharacterSet {
     /// Japanese Katakana characters (default Matrix style)
+    #[default]
     Japanese,
     /// Hindi Devanagari script
     Hindi,
@@ -28,9 +29,8 @@ impl CharacterSet {
             CharacterSet::Japanese => {
                 // Katakana characters (U+30A0 to U+30FF)
                 // Including half-width katakana for variety
-                let mut chars: Vec<char> = (0x30A0..=0x30FF)
-                    .filter_map(std::char::from_u32)
-                    .collect();
+                let mut chars: Vec<char> =
+                    (0x30A0..=0x30FF).filter_map(std::char::from_u32).collect();
 
                 // Add some half-width katakana
                 chars.extend((0xFF65..=0xFF9F).filter_map(std::char::from_u32));
@@ -41,9 +41,8 @@ impl CharacterSet {
             }
             CharacterSet::Hindi => {
                 // Devanagari script (U+0900 to U+097F)
-                let mut chars: Vec<char> = (0x0900..=0x097F)
-                    .filter_map(std::char::from_u32)
-                    .collect();
+                let mut chars: Vec<char> =
+                    (0x0900..=0x097F).filter_map(std::char::from_u32).collect();
 
                 // Add Devanagari extended (U+A8E0 to U+A8FF)
                 chars.extend((0xA8E0..=0xA8FF).filter_map(std::char::from_u32));
@@ -51,15 +50,12 @@ impl CharacterSet {
             }
             CharacterSet::Tamil => {
                 // Tamil script (U+0B80 to U+0BFF)
-                (0x0B80..=0x0BFF)
-                    .filter_map(std::char::from_u32)
-                    .collect()
+                (0x0B80..=0x0BFF).filter_map(std::char::from_u32).collect()
             }
             CharacterSet::Sinhala => {
                 // Sinhala script (U+0D80 to U+0DFF)
-                let mut chars: Vec<char> = (0x0D80..=0x0DFF)
-                    .filter_map(std::char::from_u32)
-                    .collect();
+                let mut chars: Vec<char> =
+                    (0x0D80..=0x0DFF).filter_map(std::char::from_u32).collect();
 
                 // Add Sinhala Archaic Numbers (U+111E0 to U+111FF)
                 chars.extend((0x111E0..=0x111FF).filter_map(std::char::from_u32));
@@ -79,9 +75,8 @@ impl CharacterSet {
             }
             CharacterSet::Jawi => {
                 // Arabic script (U+0600 to U+06FF)
-                let mut chars: Vec<char> = (0x0600..=0x06FF)
-                    .filter_map(std::char::from_u32)
-                    .collect();
+                let mut chars: Vec<char> =
+                    (0x0600..=0x06FF).filter_map(std::char::from_u32).collect();
 
                 // Add Arabic Supplement (U+0750 to U+077F)
                 chars.extend((0x0750..=0x077F).filter_map(std::char::from_u32));
@@ -105,7 +100,7 @@ impl CharacterSet {
                 // Calculate target counts (aim for ~500 total characters)
                 let total_target = 500;
                 let japanese_count = (total_target as f32 * 0.5) as usize; // 50%
-                let other_count = (total_target as f32 * 0.1) as usize;    // 10% each
+                let other_count = (total_target as f32 * 0.1) as usize; // 10% each
 
                 // Take Japanese characters (50%)
                 let japanese_sample: Vec<char> = japanese_chars
@@ -117,7 +112,13 @@ impl CharacterSet {
                 mixed_chars.extend(japanese_sample);
 
                 // Take from each other set (10% each)
-                for chars in [&hindi_chars, &tamil_chars, &sinhala_chars, &korean_chars, &jawi_chars] {
+                for chars in [
+                    &hindi_chars,
+                    &tamil_chars,
+                    &sinhala_chars,
+                    &korean_chars,
+                    &jawi_chars,
+                ] {
                     let sample: Vec<char> = chars
                         .iter()
                         .step_by((chars.len() / other_count).max(1))
@@ -136,12 +137,6 @@ impl CharacterSet {
     pub fn random_character(&self, rng: &mut impl rand::Rng) -> char {
         let chars = self.get_characters();
         chars[rng.gen_range(0..chars.len())]
-    }
-}
-
-impl Default for CharacterSet {
-    fn default() -> Self {
-        CharacterSet::Japanese
     }
 }
 
@@ -171,7 +166,11 @@ mod tests {
 
         for set in sets {
             let chars = set.get_characters();
-            assert!(!chars.is_empty(), "Character set {:?} should not be empty", set);
+            assert!(
+                !chars.is_empty(),
+                "Character set {:?} should not be empty",
+                set
+            );
         }
     }
 
@@ -196,8 +195,11 @@ mod tests {
         let chars = CharacterSet::Mixed.get_characters();
 
         // Should have around 500 characters
-        assert!(chars.len() >= 400 && chars.len() <= 600,
-                "Mixed set should have ~500 characters, got {}", chars.len());
+        assert!(
+            chars.len() >= 400 && chars.len() <= 600,
+            "Mixed set should have ~500 characters, got {}",
+            chars.len()
+        );
 
         // Should not be empty
         assert!(!chars.is_empty());
@@ -221,8 +223,11 @@ mod tests {
         // Japanese should be roughly 50% (within tolerance)
         let total = chars.len() as f32;
         let japanese_ratio = japanese_count as f32 / total;
-        assert!(japanese_ratio >= 0.45 && japanese_ratio <= 0.55,
-                "Japanese should be ~50%, got {:.1}%", japanese_ratio * 100.0);
+        assert!(
+            (0.45..=0.55).contains(&japanese_ratio),
+            "Japanese should be ~50%, got {:.1}%",
+            japanese_ratio * 100.0
+        );
 
         // Each other set should be roughly 10% (within tolerance)
         for (name, count) in [
@@ -233,8 +238,12 @@ mod tests {
             ("Jawi", jawi_count),
         ] {
             let ratio = count as f32 / total;
-            assert!(ratio >= 0.05 && ratio <= 0.15,
-                    "{} should be ~10%, got {:.1}%", name, ratio * 100.0);
+            assert!(
+                (0.05..=0.15).contains(&ratio),
+                "{} should be ~10%, got {:.1}%",
+                name,
+                ratio * 100.0
+            );
         }
     }
 

@@ -479,6 +479,9 @@ mod tests {
         let fast_matrix = MatrixRain::new(config);
 
         // Fast should have shorter max trail lengths
-        assert!(slow_matrix.config().speed.max_trail_length() > fast_matrix.config().speed.max_trail_length());
+        assert!(
+            slow_matrix.config().speed.max_trail_length()
+                > fast_matrix.config().speed.max_trail_length()
+        );
     }
 }

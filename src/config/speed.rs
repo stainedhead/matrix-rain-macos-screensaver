@@ -3,13 +3,14 @@
 use serde::{Deserialize, Serialize};
 
 /// Available speed settings for the rain animation
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum RainSpeed {
     /// Very slow rain
     VerySlow,
     /// Slow rain
     Slow,
     /// Medium speed (default)
+    #[default]
     Medium,
     /// Fast rain
     Fast,
@@ -63,12 +64,6 @@ impl RainSpeed {
             RainSpeed::Fast,
             RainSpeed::VeryFast,
         ]
-    }
-}
-
-impl Default for RainSpeed {
-    fn default() -> Self {
-        RainSpeed::Medium
     }
 }
 

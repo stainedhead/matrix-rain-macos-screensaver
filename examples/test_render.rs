@@ -1,7 +1,7 @@
 //! Test the rendering output to verify colors and background layer
 
-use matrix_rain_core::*;
 use matrix_rain_core::rendering::{Color, RenderChar, Renderer};
+use matrix_rain_core::*;
 
 struct DebugRenderer {
     width: u32,
@@ -56,7 +56,10 @@ fn main() {
     println!("  Color scheme: {:?}", config.color_scheme);
     println!("  Speed: {:?}", config.speed);
     println!("  Screen: {}x{}", config.screen_width, config.screen_height);
-    println!("  Background layer enabled: {}", config.enable_background_layer);
+    println!(
+        "  Background layer enabled: {}",
+        config.enable_background_layer
+    );
 
     // Create engine
     let mut matrix = MatrixRain::new(config);
@@ -67,7 +70,11 @@ fn main() {
         matrix.update();
         matrix.render(&mut renderer);
 
-        println!("\nFrame {}: Rendered {} characters", i + 1, renderer.chars_rendered.len());
+        println!(
+            "\nFrame {}: Rendered {} characters",
+            i + 1,
+            renderer.chars_rendered.len()
+        );
 
         // Check for color variations
         let mut colors_seen = std::collections::HashSet::new();

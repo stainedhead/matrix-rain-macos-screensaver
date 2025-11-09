@@ -81,13 +81,7 @@ pub unsafe extern "C" fn matrix_rain_update(handle: *mut MatrixRainHandle) {
     handle.engine.update();
 }
 
-/// Get render data for drawing
-/// Returns a pointer to an array of RenderCharFFI and sets the count
-///
-/// # Safety
-/// - `handle` must be a valid pointer
-/// - `out_count` must be a valid pointer to write the count
-/// - The returned pointer is valid until the next call to this function or `matrix_rain_destroy`
+/// Represents a character to render (C-compatible struct)
 #[repr(C)]
 pub struct RenderCharFFI {
     pub character: u32, // Unicode codepoint
@@ -100,6 +94,14 @@ pub struct RenderCharFFI {
     pub font_size: f32,
 }
 
+/// Get render data for drawing
+/// Returns a pointer to an array of RenderCharFFI and sets the count
+///
+/// # Safety
+/// - `handle` must be a valid pointer returned from `matrix_rain_new`
+/// - `handle` must not be null
+/// - `out_count` must be a valid pointer to write the count
+/// - The returned pointer is valid until the next call to this function or `matrix_rain_destroy`
 #[no_mangle]
 pub unsafe extern "C" fn matrix_rain_get_render_chars(
     handle: *mut MatrixRainHandle,
@@ -280,7 +282,10 @@ mod tests {
 
             // Should have some characters to render
             assert!(count > 0, "Expected some render characters after updates");
-            assert!(!data_ptr.is_null(), "Render data pointer should not be null");
+            assert!(
+                !data_ptr.is_null(),
+                "Render data pointer should not be null"
+            );
 
             // Verify we can access the data
             let render_slice = std::slice::from_raw_parts(data_ptr, count);

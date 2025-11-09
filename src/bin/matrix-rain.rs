@@ -162,22 +162,20 @@ fn main() -> Result<()> {
         // Check for events (key press or resize)
         if event::poll(Duration::from_millis(10))? {
             match event::read()? {
-                Event::Key(KeyEvent { code, modifiers, .. }) => {
-                    match code {
-                        KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => break Ok(()),
-                        KeyCode::Char('c') if modifiers.contains(KeyModifiers::CONTROL) => {
-                            break Ok(())
-                        }
-                        _ => {}
-                    }
-                }
+                Event::Key(KeyEvent {
+                    code, modifiers, ..
+                }) => match code {
+                    KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => break Ok(()),
+                    KeyCode::Char('c') if modifiers.contains(KeyModifiers::CONTROL) => break Ok(()),
+                    _ => {}
+                },
                 Event::Resize(new_width, new_height) => {
                     // Handle terminal resize
                     let new_config = ScreenSaverConfig::new(
                         charset,
                         color,
                         speed,
-                        new_width as u32 * 8,  // Approximate pixel width
+                        new_width as u32 * 8,   // Approximate pixel width
                         new_height as u32 * 16, // Approximate pixel height
                     );
                     matrix.set_config(new_config);

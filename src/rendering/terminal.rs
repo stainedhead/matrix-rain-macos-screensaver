@@ -4,7 +4,7 @@
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
     execute,
-    style::{Color as TermColor, Print, SetBackgroundColor, SetForegroundColor, ResetColor},
+    style::{Color as TermColor, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
     terminal::{self, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
 

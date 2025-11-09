@@ -449,3 +449,31 @@ Before committing code, ensure:
 - [ ] Performance impact is acceptable
 - [ ] No debug print statements left in code
 - [ ] Commit message follows guidelines
+
+## Pre-Push Checklist
+
+**CRITICAL**: Before pushing changes to the repository, always run the full CI linting suite locally to prevent CI failures:
+
+```bash
+# Run both formatting check and clippy with all targets
+cargo fmt --all -- --check && cargo clippy --all-targets --all-features -- -D warnings
+```
+
+If either command fails:
+1. **Formatting issues**: Run `cargo fmt --all` to auto-fix
+2. **Clippy warnings**: Fix each warning according to clippy's suggestions
+3. **Re-run the checks** to ensure everything passes
+4. Only then push your changes
+
+**Why this matters**:
+- CI failures block merges and waste time
+- Local checks are faster than waiting for CI
+- Prevents "fix linting" commits that clutter history
+- Ensures code quality before it reaches the repository
+
+**Tip**: You can create a git pre-push hook to automate this:
+```bash
+#!/bin/bash
+# .git/hooks/pre-push
+cargo fmt --all -- --check && cargo clippy --all-targets --all-features -- -D warnings
+```

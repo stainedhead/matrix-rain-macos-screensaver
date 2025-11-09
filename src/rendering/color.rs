@@ -27,7 +27,7 @@ impl Color {
             r,
             g,
             b,
-            a: a.max(0.0).min(1.0),
+            a: a.clamp(0.0, 1.0),
         }
     }
 
@@ -53,7 +53,7 @@ impl Color {
 
     /// Darken the color by a factor (0.0 = black, 1.0 = no change)
     pub fn darken(&self, factor: f32) -> Self {
-        let factor = factor.max(0.0).min(1.0);
+        let factor = factor.clamp(0.0, 1.0);
         Self::rgba(
             (self.r as f32 * factor) as u8,
             (self.g as f32 * factor) as u8,
@@ -64,7 +64,7 @@ impl Color {
 
     /// Lighten the color by a factor (0.0 = no change, 1.0 = white)
     pub fn lighten(&self, factor: f32) -> Self {
-        let factor = factor.max(0.0).min(1.0);
+        let factor = factor.clamp(0.0, 1.0);
         Self::rgba(
             (self.r as f32 + (255.0 - self.r as f32) * factor) as u8,
             (self.g as f32 + (255.0 - self.g as f32) * factor) as u8,
