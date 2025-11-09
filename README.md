@@ -143,6 +143,23 @@ matrix-rain --list
 **Controls:**
 - Press `q`, `Q`, or `Esc` to exit
 - Press `Ctrl+C` to exit
+- The terminal will automatically adapt if you resize the window
+
+**Terminal Requirements:**
+- UTF-8 encoding (should be default on macOS)
+- 24-bit True Color support (most modern terminals)
+- A font with Unicode support (SF Mono, Menlo, Noto Sans Mono, Cascadia Code)
+
+**Troubleshooting:**
+```bash
+# Run diagnostics to check your terminal setup
+cargo run --example diagnose
+
+# If you see character boxes (□), your font lacks Unicode coverage
+# If you see color issues, your terminal may not support 24-bit color
+```
+
+See [FONT_REQUIREMENTS.md](FONT_REQUIREMENTS.md) for detailed terminal and font information.
 
 ### As a Library
 

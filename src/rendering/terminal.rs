@@ -4,7 +4,7 @@
 use crossterm::{
     cursor::{Hide, MoveTo, Show},
     execute,
-    style::{Color as TermColor, Print, SetForegroundColor},
+    style::{Color as TermColor, Print, SetBackgroundColor, SetForegroundColor, ResetColor},
     terminal::{self, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen},
 };
 
@@ -34,13 +34,19 @@ impl TerminalRenderer {
     /// Initialize the terminal for rendering
     pub fn init(&mut self) -> io::Result<()> {
         terminal::enable_raw_mode()?;
-        execute!(io::stdout(), EnterAlternateScreen, Hide)?;
+        execute!(
+            io::stdout(),
+            EnterAlternateScreen,
+            Hide,
+            SetBackgroundColor(TermColor::Black),
+            Clear(ClearType::All)
+        )?;
         Ok(())
     }
 
     /// Restore the terminal to normal mode
     pub fn cleanup(&mut self) -> io::Result<()> {
-        execute!(io::stdout(), Show, LeaveAlternateScreen)?;
+        execute!(io::stdout(), ResetColor, Show, LeaveAlternateScreen)?;
         terminal::disable_raw_mode()?;
         Ok(())
     }
@@ -58,7 +64,11 @@ impl TerminalRenderer {
 #[cfg(feature = "cli")]
 impl Renderer for TerminalRenderer {
     fn clear(&mut self, _color: Color) {
-        let _ = execute!(io::stdout(), Clear(ClearType::All));
+        let _ = execute!(
+            io::stdout(),
+            SetBackgroundColor(TermColor::Black),
+            Clear(ClearType::All)
+        );
     }
 
     fn draw_char(&mut self, render_char: &RenderChar) {
