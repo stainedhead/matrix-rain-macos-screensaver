@@ -26,6 +26,7 @@ core-graphics = "0.23"
 [features]
 default = []
 cli = ["crossterm", "clap", "anyhow"]
+ffi = []
 
 [lib]
 name = "matrix_rain_core"

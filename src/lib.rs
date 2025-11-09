@@ -7,6 +7,9 @@ pub mod config;
 pub mod engine;
 pub mod rendering;
 
+#[cfg(feature = "ffi")]
+pub mod ffi;
+
 pub use config::{CharacterSet, ColorScheme, RainSpeed, ScreenSaverConfig};
 pub use engine::{MatrixRain, RainColumn};
 pub use rendering::{Color, Renderer};
