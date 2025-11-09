@@ -8,6 +8,17 @@ A customizable Matrix-style digital rain screensaver for macOS, written in Rust.
 
 ## Features
 
+### ✨ Authentic Matrix Visual Effects
+- **Bright White Leading Characters**: Classic Matrix effect with white "leaders"
+- **Smooth Color Fade**: 4-stage progression (white → bright → medium → dark)
+- **Dual-Layer Depth**: Subtle background rain for atmospheric depth
+  - Background layer at 30% opacity
+  - Slower speed (60% of foreground)
+  - Sparser coverage (every 3rd column)
+  - Creates natural depth perception
+- **Dynamic Effects**: Character glitching, variable speeds, smooth trails
+- **Screen Resize Support**: Automatic adaptation to window/terminal size changes
+
 ### 🌐 Multiple Language Support
 Choose from six different character sets:
 - **Japanese** (Katakana) - The classic Matrix look
@@ -370,6 +381,8 @@ For detailed technical information, see [documents/technical-details.md](documen
 - [x] Core rain engine with authentic Matrix visuals
 - [x] **Bright white leading character effect** (classic Matrix look)
 - [x] **Smooth color fade progression** (white → bright → medium → dark)
+- [x] **Dual-layer background rain** for depth effect (30% opacity, slower speed)
+- [x] **Full screen resize support** (CLI, engine, FFI, screensaver)
 - [x] Multiple character set support (6 languages)
 - [x] Color customization (11 color schemes)
 - [x] Speed settings (5 levels)
