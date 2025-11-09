@@ -25,6 +25,8 @@ pub struct ScreenSaverConfig {
     pub screen_width: u32,
     /// Screen height in pixels
     pub screen_height: u32,
+    /// Enable background rain layer for depth effect
+    pub enable_background_layer: bool,
 }
 
 impl Default for ScreenSaverConfig {
@@ -35,6 +37,7 @@ impl Default for ScreenSaverConfig {
             speed: RainSpeed::Medium,
             screen_width: 1920,
             screen_height: 1080,
+            enable_background_layer: true,
         }
     }
 }
@@ -54,6 +57,26 @@ impl ScreenSaverConfig {
             speed,
             screen_width,
             screen_height,
+            enable_background_layer: true,
+        }
+    }
+
+    /// Create a new configuration with all parameters including background layer
+    pub fn with_background(
+        character_set: CharacterSet,
+        color_scheme: ColorScheme,
+        speed: RainSpeed,
+        screen_width: u32,
+        screen_height: u32,
+        enable_background_layer: bool,
+    ) -> Self {
+        Self {
+            character_set,
+            color_scheme,
+            speed,
+            screen_width,
+            screen_height,
+            enable_background_layer,
         }
     }
 

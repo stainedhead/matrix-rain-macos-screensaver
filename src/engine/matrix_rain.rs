@@ -10,8 +10,10 @@ use super::RainColumn;
 pub struct MatrixRain {
     /// Configuration
     config: ScreenSaverConfig,
-    /// All rain columns
+    /// Foreground rain columns (main bright rain)
     columns: Vec<RainColumn>,
+    /// Background rain columns (subtle depth layer)
+    background_columns: Vec<RainColumn>,
     /// Random number generator
     rng: StdRng,
     /// Character width in pixels
@@ -35,7 +37,7 @@ impl MatrixRain {
         // Calculate number of columns
         let num_columns = (config.screen_width as f32 / char_width).ceil() as usize;
 
-        // Create columns with staggered start times
+        // Create foreground columns with staggered start times
         let max_length = config.speed.max_trail_length();
         let base_speed = config.speed.speed_multiplier();
 
@@ -45,9 +47,24 @@ impl MatrixRain {
             columns.push(column);
         }
 
+        // Create background columns (more sparse, slower, dimmer)
+        let mut background_columns = Vec::new();
+        if config.enable_background_layer {
+            // Use every 3rd column for background (sparser)
+            for x in (0..num_columns).step_by(3) {
+                // Background rain is slower (60% of normal speed)
+                let bg_speed = base_speed * 0.6;
+                // Shorter trails for background
+                let bg_max_length = max_length / 2;
+                let column = RainColumn::new(x, bg_max_length, bg_speed, &mut rng);
+                background_columns.push(column);
+            }
+        }
+
         Self {
             config,
             columns,
+            background_columns,
             rng,
             char_width,
             char_height,
@@ -60,6 +77,7 @@ impl MatrixRain {
         let char_set = self.config.character_set;
         let screen_height = self.config.screen_height as f32;
 
+        // Update foreground columns
         for column in &mut self.columns {
             column.update(&char_set, &mut self.rng);
 
@@ -74,10 +92,33 @@ impl MatrixRain {
             }
         }
 
-        // Randomly activate inactive columns
+        // Randomly activate inactive foreground columns
         for column in &mut self.columns {
             if !column.active && self.rng.gen_bool(0.01) {
                 column.reset(&mut self.rng);
+            }
+        }
+
+        // Update background columns (if enabled)
+        if self.config.enable_background_layer {
+            for column in &mut self.background_columns {
+                column.update(&char_set, &mut self.rng);
+
+                // Reset background columns with lower frequency
+                if column.is_off_screen(screen_height, self.char_height) {
+                    if self.rng.gen_bool(0.05) {
+                        column.reset(&mut self.rng);
+                    } else {
+                        column.active = false;
+                    }
+                }
+            }
+
+            // Randomly activate inactive background columns (less frequent)
+            for column in &mut self.background_columns {
+                if !column.active && self.rng.gen_bool(0.005) {
+                    column.reset(&mut self.rng);
+                }
             }
         }
     }
@@ -90,6 +131,43 @@ impl MatrixRain {
         // Collect all characters to render
         let mut render_chars = Vec::new();
 
+        // Render background layer first (if enabled)
+        if self.config.enable_background_layer {
+            for column in &self.background_columns {
+                if !column.active {
+                    continue;
+                }
+
+                let x_pixel = column.x as f32 * self.char_width;
+
+                for (ch, y_pos, trail_pos) in column.get_trail_positions() {
+                    if y_pos < 0.0 {
+                        continue;
+                    }
+
+                    let y_pixel = y_pos * self.char_height;
+
+                    if y_pixel > self.config.screen_height as f32 {
+                        continue;
+                    }
+
+                    // Background characters are much dimmer (30% opacity, no white leader)
+                    let rgba = self.config.color_scheme.get_color_with_alpha(trail_pos);
+                    let mut color = Color::from_rgba_tuple(rgba);
+                    color.a *= 0.3; // Reduce alpha to 30% for subtle background effect
+
+                    render_chars.push(RenderChar {
+                        character: ch,
+                        x: x_pixel,
+                        y: y_pixel,
+                        color,
+                        font_size: self.font_size * 0.9, // Slightly smaller font for depth
+                    });
+                }
+            }
+        }
+
+        // Render foreground layer (main rain)
         for column in &self.columns {
             if !column.active {
                 continue;
@@ -146,7 +224,7 @@ impl MatrixRain {
         self.config = config;
 
         if dimensions_changed {
-            // Recalculate columns
+            // Recalculate foreground columns
             let num_columns = (self.config.screen_width as f32 / self.char_width).ceil() as usize;
             let max_length = self.config.speed.max_trail_length();
             let base_speed = self.config.speed.speed_multiplier();
@@ -156,13 +234,31 @@ impl MatrixRain {
                 let column = RainColumn::new(x, max_length, base_speed, &mut self.rng);
                 self.columns.push(column);
             }
+
+            // Recalculate background columns
+            self.background_columns.clear();
+            if self.config.enable_background_layer {
+                for x in (0..num_columns).step_by(3) {
+                    let bg_speed = base_speed * 0.6;
+                    let bg_max_length = max_length / 2;
+                    let column = RainColumn::new(x, bg_max_length, bg_speed, &mut self.rng);
+                    self.background_columns.push(column);
+                }
+            }
         } else if speed_changed {
             let max_length = self.config.speed.max_trail_length();
             let base_speed = self.config.speed.speed_multiplier();
 
+            // Update foreground column speeds
             for column in &mut self.columns {
                 column.speed = base_speed * self.rng.gen_range(0.7..=1.3);
                 column.max_length = self.rng.gen_range(max_length / 2..=max_length);
+            }
+
+            // Update background column speeds
+            for column in &mut self.background_columns {
+                column.speed = base_speed * 0.6 * self.rng.gen_range(0.7..=1.3);
+                column.max_length = self.rng.gen_range(max_length / 4..=max_length / 2);
             }
         }
     }
@@ -181,6 +277,43 @@ impl MatrixRain {
     pub fn get_render_data(&self) -> Vec<RenderChar> {
         let mut render_chars = Vec::new();
 
+        // Add background layer first (if enabled)
+        if self.config.enable_background_layer {
+            for column in &self.background_columns {
+                if !column.active {
+                    continue;
+                }
+
+                let x_pixel = column.x as f32 * self.char_width;
+
+                for (ch, y_pos, trail_pos) in column.get_trail_positions() {
+                    if y_pos < 0.0 {
+                        continue;
+                    }
+
+                    let y_pixel = y_pos * self.char_height;
+
+                    if y_pixel > self.config.screen_height as f32 {
+                        continue;
+                    }
+
+                    // Background characters are much dimmer
+                    let rgba = self.config.color_scheme.get_color_with_alpha(trail_pos);
+                    let mut color = Color::from_rgba_tuple(rgba);
+                    color.a *= 0.3; // 30% opacity for subtle effect
+
+                    render_chars.push(RenderChar {
+                        character: ch,
+                        x: x_pixel,
+                        y: y_pixel,
+                        color,
+                        font_size: self.font_size * 0.9,
+                    });
+                }
+            }
+        }
+
+        // Add foreground layer
         for column in &self.columns {
             if !column.active {
                 continue;
